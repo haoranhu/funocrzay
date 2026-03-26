@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Funocracy 小游戏</title>
+    <meta name="description" content="Funocracy 创业融资模拟小游戏">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-title {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .story-text {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            min-height: 80px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            border-left: 4px solid #764ba2;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .choice-btn:active {
+            transform: translateX(3px);
+        }
+
+        .result-section {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .result-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .final-result {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .final-result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .final-result h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .final-result p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                padding: 25px;
+            }
+
+            .game-title {
+                font-size: 24px;
+            }
+
+            .choice-btn {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+
+            .info-card {
+                padding: 10px;
+            }
+
+            .info-value {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-board">
+            <h1 class="game-title">🚀 创业融资之旅</h1>
+
+            <div class="game-info">
+                <div class="info-card">
+                    <div class="info-label">轮数</div>
+                    <div class="info-value"><span id="round">1</span>/5</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">融资进度</div>
+                    <div class="info-value"><span id="funding">0</span>%</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="story-text" id="storyText"></div>
+
+            <div class="choices" id="choices"></div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-text" id="resultText"></div>
+            </div>
+
+            <div class="final-result" id="finalResult">
+                <h2 id="finalTitle"></h2>
+                <p id="finalText"></p>
+                <button class="restart-btn" onclick="location.reload()">🔄 重新开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据
+        const gameData = [
+            {
+                round: 1,
+                story: "你是一位充满创意的创业者，有一个革命性的 AI 创业想法。现在你需要为第一轮融资做准备。",
+                choices: [
+                    { text: "📊 制作精美的 PPT 和商业计划书", effect: 20, description: "投资者很欣赏你的专业态度，给了你积极反馈。" },
+                    { text: "🎥 制作一个产品演示视频", effect: 15, description: "视频展示很吸引人，但还需要更多数据支撑。" },
+                    { text: "💬 直接和投资者去咖啡馆聊天", effect: 10, description: "轻松的交谈建立了信任，但投资者想看更多详情。" }
+                ]
+            },
+            {
+                round: 2,
+                story: "经过第一轮的努力，你已经获得了一些关注。现在需要证明你的市场认知。",
+                choices: [
+                    { text: "📈 进行详细的市场调研并呈现数据", effect: 20, description: "数据非常有说服力，投资者投入了资金！" },
+                    { text: "👥 做用户访谈，收集真实反馈", effect: 18, description: "用户反馈很积极，这给了投资者很大信心。" },
+                    { text: "⚡ 快速做出 MVP 让用户试用", effect: 15, description: "虽然不够完美，但真实的产品让人更感兴趣。" }
+                ]
+            },
+            {
+                round: 3,
+                story: "融资进展顺利！但竞争对手也在融资。你需要证明你的竞争优势。",
+                choices: [
+                    { text: "🏆 参加创业大赛赢得认可", effect: 18, description: "赢得大赛的认可让投资者看到你的潜力。" },
+                    { text: "🚀 展示初步的产品牵引力和用户增长", effect: 22, description: "增长数据非常亮眼，这正是投资者想看的！" },
+                    { text: "💡 发表行业洞察文章和演讲", effect: 16, description: "你被认为是该领域的思想领袖。" }
+                ]
+            },
+            {
+                round: 4,
+                story: "融资已经接近尾声，但几家基金在犹豫。最后一搏需要你展示执行力。",
+                choices: [
+                    { text: "✅ 展示已经签下的第一批付费客户", effect: 25, description: "付费客户是最强的信号，投资者立即决定投入！" },
+                    { text: "👨‍💼 拉上业界大咖作为顾问加入团队", effect: 20, description: "强大的顾问阵容给了投资者很大信心。" },
+                    { text: "📱 展示用户增长的加速趋势", effect: 18, description: "增长指数看起来很不错。" }
+                ]
+            },
+            {
+                round: 5,
+                story: "关键时刻！最后的决定将决定你的融资成功。",
+                choices: [
+                    { text: "💼 现场签订投资意向书（Term Sheet）", effect: 25, description: "成功融资！你的创业梦想变成现实！" },
+                    { text: "🤝 承诺 6 个月内达成的具体目标", effect: 20, description: "投资者被你的决心感动，决定投资。" },
+                    { text: "📞 整理所有投资者的反馈再优化方案", effect: 10, description: "优化很好，但也失去了融资的窗口期。" }
+                ]
+            }
+        ];
+
+        let currentRound = 0;
+        let totalFunding = 0;
+
+        function updateUI() {
+            document.getElementById('round').textContent = currentRound + 1;
+            document.getElementById('funding').textContent = totalFunding;
+            document.getElementById('progressFill').style.width = totalFunding + '%';
+        }
+
+        function displayRound() {
+            if (currentRound >= gameData.length) {
+                endGame();
+                return;
+            }
+
+            const round = gameData[currentRound];
+            document.getElementById('storyText').textContent = round.story;
+            
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+
+            round.choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = () => makeChoice(index, choice);
+                choicesDiv.appendChild(btn);
+            });
+
+            document.getElementById('resultSection').classList.remove('show');
+            updateUI();
+        }
+
+        function makeChoice(index, choice) {
+            totalFunding = Math.min(100, totalFunding + choice.effect);
+            
+            document.getElementById('resultTitle').textContent = '✨ 结果';
+            document.getElementById('resultText').textContent = choice.description;
+            document.getElementById('resultSection').classList.add('show');
+            
+            updateUI();
+            
+            document.getElementById('choices').style.display = 'none';
+            
+            setTimeout(() => {
+                currentRound++;
+                document.getElementById('choices').style.display = 'flex';
+                displayRound();
+            }, 2000);
+        }
+
+        function endGame() {
+            document.getElementById('choices').style.display = 'none';
+            document.getElementById('storyText').textContent = '';
+            document.getElementById('resultSection').classList.remove('show');
+            
+            const finalResult = document.getElementById('finalResult');
+            
+            if (totalFunding >= 90) {
+                document.getElementById('finalTitle').textContent = '🎉 完美融资！';
+                document.getElementById('finalText').textContent = '你成功了！你的创业公司完成了 A 轮融资，融资金额达到了预期，投资者对你充满信心。现在是时候开始改变世界了！';
+            } else if (totalFunding >= 70) {
+                document.getElementById('finalTitle').textContent = '👍 成功融资！';
+                document.getElementById('finalText').textContent = '虽然没有达到最优结果，但你仍然成功融资了。投资者看好你的潜力，现在需要用产品和增长来证明他们的选择。';
+            } else if (totalFunding >= 50) {
+                document.getElementById('finalTitle').textContent = '💪 部分成功';
+                document.getElementById('finalText').textContent = '你获得了一些投资，但可能没有达到目标融资额。需要继续努力和调整策略。';
+            } else {
+                document.getElementById('finalTitle').textContent = '🔄 再来一次';
+                document.getElementById('finalText').textContent = '这一次融资没有成功，但这是创业的常态。分析一下策略，下一轮会做得更好！';
+            }
+            
+            finalResult.classList.add('show');
+        }
+
+        // 游戏启动
+        displayRound();
+    </script>
+</body>
+</html>
