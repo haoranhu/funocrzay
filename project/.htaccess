@@ -1,0 +1,126 @@
+# Apache 服务器 SEO 优化配置 (.htaccess)
+# 该文件应放在网站根目录中
+
+# ===== 启用 Mod Rewrite =====
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # 删除 .html 扩展名
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^\.]+)$ $1.html [NC,L]
+    
+    # 重定向 www 到非 www
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+    
+    # 强制 HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ===== Gzip 压缩 - 提高页面加载速度 =====
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
+    
+    # 移除 Cookie
+    Header append Vary Accept-Encoding
+</IfModule>
+
+# ===== 浏览器缓存 =====
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # HTML
+    ExpiresByType text/html "access 1 hour"
+    
+    # CSS/JavaScript
+    ExpiresByType text/css "access 1 year"
+    ExpiresByType application/javascript "access 1 year"
+    ExpiresByType application/json "access 1 year"
+    
+    # 图片
+    ExpiresByType image/jpeg "access 1 year"
+    ExpiresByType image/png "access 1 year"
+    ExpiresByType image/webp "access 1 year"
+    ExpiresByType image/svg+xml "access 1 year"
+    
+    # 字体
+    ExpiresByType font/woff2 "access 1 year"
+    ExpiresByType font/woff "access 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access 1 year"
+    
+    # 默认缓存时间
+    ExpiresDefault "access 2 days"
+</IfModule>
+
+# ===== 设置缓存控制头 =====
+<FilesMatch "\.html?$">
+    Header set Cache-Control "max-age=3600, must-revalidate"
+</FilesMatch>
+
+<FilesMatch "\.(jpg|jpeg|png|gif|svg|webp)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+<FilesMatch "\.(js|css)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# ===== 安全性 Headers - SEO 友好 =====
+<IfModule mod_headers.c>
+    # 防止点击劫持
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # 防止 MIME 类型嗅探
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # 启用 XSS 保护
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # 内容安全策略
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self';"
+    
+    # 引用 Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # 权限策略
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ===== 阻止访问敏感文件 =====
+<FilesMatch "\.(env|sql|sql\.gz|bak|config|\.)?php$|\.{2,}">
+    Deny from all
+</FilesMatch>
+
+# ===== SEO 友好的 404 错误处理 =====
+# ErrorDocument 404 /404.html
+
+# ===== 禁用目录列表 =====
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# ===== 移除服务器签名 =====
+ServerTokens Prod
+ServerSignature Off
+
+# ===== 字符编码 - UTF-8 =====
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .html .css .js .xml .json
+
+# ===== MIME 类型 =====
+<IfModule mod_mime.c>
+    AddType text/html .html
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType application/json .json
+    AddType application/xml .xml .svg
+    AddType image/webp .webp
+    AddType font/woff2 .woff2
+    AddEncoding gzip .gz
+</IfModule>
+
+# ===== SEO 友好重定向 =====
+# 示例: 旧页面到新页面的 301 重定向
+# Redirect 301 /old-page.html https://example.com/new-page.html
