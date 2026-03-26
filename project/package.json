@@ -1,0 +1,67 @@
+{
+  "name": "funocracy-seo-optimized",
+  "version": "1.0.0",
+  "description": "SEO 优化的 Funocracy 创业生态平台网站，使用 iframe 复刻原始网站",
+  "author": "Funocracy Team",
+  "license": "MIT",
+  "keywords": [
+    "SEO",
+    "优化",
+    "创业平台",
+    "创业生态",
+    "网站优化",
+    "iframe"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/funocracy/seo-optimized.git"
+  },
+  "scripts": {
+    "start": "http-server -p 8000 -g",
+    "build": "npm run optimize:css && npm run optimize:images",
+    "optimize:css": "cleancss -o styles.min.css styles.css",
+    "optimize:images": "imagemin images/* --out-dir=images/optimized",
+    "lint:seo": "node scripts/seo-audit.js",
+    "lint:html": "html-validate index.html",
+    "test:performance": "lighthouse http://localhost:8000 --output html --output-path ./lighthouse-report.html",
+    "deploy": "npm run build && npm run lint:seo",
+    "sitemap:generate": "node scripts/generate-sitemap.js",
+    "meta:validate": "node scripts/validate-meta.js"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.0",
+    "eslint": "^8.40.0",
+    "html-validate": "^8.0.0",
+    "http-server": "^14.1.1",
+    "imagemin": "^7.0.1",
+    "imagemin-webp": "^7.0.0",
+    "lighthouse": "^9.6.8",
+    "prettier": "^2.8.8",
+    "sitemap": "^7.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not IE 11"
+  ],
+  "seo": {
+    "targetKeywords": [
+      "创业平台",
+      "创业生态",
+      "商业资源",
+      "投资机遇",
+      "创业指导",
+      "创新创业",
+      "创业社区",
+      "融资指南",
+      "市场研究"
+    ],
+    "minContentLength": 2000,
+    "targetKeywordDensity": "1-2%",
+    "longtailKeywordRatio": "60-70%"
+  }
+}
